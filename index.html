@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gratuity calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #E7EBE9;
+    --card: #FBFAF6;
+    --ink: #1F3A4D;
+    --ink-light: #5C7282;
+    --rule: #CCD4D2;
+    --gold: #B8902F;
+    --green: #2F6B3F;
+    --green-bg: #E7F0E8;
+    --amber: #93620F;
+    --amber-bg: #F6EEDD;
+    --red: #8B2E2E;
+    --red-bg: #F5E8E6;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', Arial, sans-serif;
+    line-height: 1.55;
+    padding: 3rem 1rem;
+  }
+
+  .page { max-width: 720px; margin: 0 auto; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .gold-rule {
+    height: 5px;
+    background: repeating-linear-gradient(to right, var(--gold) 0, var(--gold) 6px, transparent 6px, transparent 11px);
+  }
+
+  header {
+    padding: 2.25rem 2.5rem 1.75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    font-weight: 500;
+    margin: 0 0 0.6rem;
+  }
+
+  h1 {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-weight: 600;
+    font-size: 30px;
+    margin: 0 0 0.5rem;
+    color: var(--ink);
+  }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--ink-light);
+    margin: 0;
+    max-width: 46ch;
+  }
+
+  section.block {
+    padding: 1.75rem 2.5rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .section-label {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    font-weight: 500;
+    margin: 0 0 1.1rem;
+  }
+
+  .field-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px dashed var(--rule);
+  }
+
+  .field-row:last-child { border-bottom: none; }
+
+  .field-row label {
+    font-size: 14px;
+    color: var(--ink);
+    flex: 0 0 auto;
+  }
+
+  .field-row .control { flex: 0 0 auto; min-width: 200px; }
+
+  input, select {
+    width: 100%;
+    font-family: 'IBM Plex Sans', Arial, sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 0.45rem 0.6rem;
+  }
+
+  input:focus, select:focus {
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
+    border-color: var(--gold);
+  }
+
+  .results { padding: 2rem 2.5rem; border-bottom: 1px solid var(--rule); }
+
+  .verdict {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+  }
+
+  .stamp {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 3px double var(--green);
+    color: var(--green);
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.65rem 1.1rem;
+    border-radius: 6px;
+    transform: rotate(-6deg);
+    background: var(--green-bg);
+    white-space: nowrap;
+  }
+
+  .stamp.amber { border-color: var(--amber); color: var(--amber); background: var(--amber-bg); }
+  .stamp.red { border-color: var(--red); color: var(--red); background: var(--red-bg); }
+
+  .verdict-note {
+    font-size: 14px;
+    color: var(--ink-light);
+    flex: 1 1 240px;
+    margin: 0;
+  }
+
+  #date-error {
+    color: var(--red);
+    font-size: 13px;
+    margin: 0 0 1rem;
+    display: none;
+  }
+
+  .ledger-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.55rem 0;
+    border-bottom: 1px dashed var(--rule);
+    font-size: 14px;
+  }
+
+  .ledger-row span.value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 500;
+  }
+
+  .total-block {
+    padding: 1.75rem 2.5rem;
+    background: var(--card);
+  }
+
+  .total-rule {
+    border-top: 3px double var(--ink);
+    padding-top: 1.25rem;
+  }
+
+  .total-label {
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    margin: 0 0 0.4rem;
+  }
+
+  .total-amount {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 500;
+    font-size: 34px;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  footer {
+    padding: 1.75rem 2.5rem 2.25rem;
+    font-size: 12.5px;
+    color: var(--ink-light);
+  }
+
+  footer ul { margin: 0.5rem 0 0; padding-left: 1.1rem; }
+  footer li { margin-bottom: 0.4rem; }
+
+  @media (max-width: 560px) {
+    header, section.block, .results, .total-block, footer { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .field-row { flex-direction: column; align-items: stretch; gap: 0.4rem; }
+    .field-row .control { min-width: 0; width: 100%; }
+    h1 { font-size: 26px; }
+    .total-amount { font-size: 28px; }
+  }
+
+  @media print {
+    body { background: #fff; padding: 0; }
+    .card { border: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="card">
+    <div class="gold-rule"></div>
+
+    <header>
+      <p class="eyebrow">Payment of Gratuity Act, 1972 &middot; Code on Social Security, 2020</p>
+      <h1>Gratuity calculator</h1>
+      <p class="subtitle">Enter your service details to check your eligibility and see an estimate of your gratuity.</p>
+    </header>
+
+    <section class="block">
+      <p class="section-label">Service details</p>
+      <div class="field-row">
+        <label for="joindate">Date of joining</label>
+        <div class="control"><input type="date" id="joindate" value="2021-10-15" /></div>
+      </div>
+      <div class="field-row">
+        <label for="lastdate">Last working date</label>
+        <div class="control"><input type="date" id="lastdate" value="2026-06-26" /></div>
+      </div>
+      <div class="field-row">
+        <label for="emptype">Employment type</label>
+        <div class="control">
+          <select id="emptype">
+            <option value="permanent" selected>Permanent employee</option>
+            <option value="fixed-term">Fixed-term contract</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row">
+        <label for="reason">Reason for leaving</label>
+        <div class="control">
+          <select id="reason">
+            <option value="normal" selected>Resignation / retirement</option>
+            <option value="death">Death</option>
+            <option value="disablement">Disablement (accident or disease)</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <p class="section-label">Pay details</p>
+      <div class="field-row">
+        <label for="salary">Last drawn monthly salary (basic + DA)</label>
+        <div class="control"><input type="number" id="salary" value="50000" min="0" step="500" /></div>
+      </div>
+      <div class="field-row">
+        <label for="covered">Employer covered under the Gratuity Act</label>
+        <div class="control">
+          <select id="covered">
+            <option value="yes" selected>Yes (10+ employees)</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="results" aria-live="polite">
+      <p id="date-error">Last working date must be on or after the date of joining.</p>
+
+      <div class="verdict">
+        <div class="stamp" id="stamp">Eligible</div>
+        <p class="verdict-note" id="verdict-note">Completed 4 years 8 months of continuous service.</p>
+      </div>
+
+      <div class="ledger-row">
+        <span>Tenure served</span>
+        <span class="value" id="out-tenure">4y 8m 11d</span>
+      </div>
+      <div class="ledger-row">
+        <span>Years counted for calculation</span>
+        <span class="value" id="out-years">5</span>
+      </div>
+      <div class="ledger-row">
+        <span>Formula applied</span>
+        <span class="value" id="out-formula">15 &times; salary &times; years &divide; 26</span>
+      </div>
+    </section>
+
+    <div class="total-block">
+      <div class="total-rule">
+        <p class="total-label" id="out-label">Estimated gratuity payable</p>
+        <p class="total-amount" id="out-gratuity">&#8377;1,44,231</p>
+      </div>
+    </div>
+
+    <footer>
+      <p style="margin:0 0 0.4rem; font-weight: 500; color: var(--ink);">How this is worked out</p>
+      <ul>
+        <li>Gratuity is generally payable after 5 years of continuous service. This requirement is waived if employment ends due to death or disablement from accident or disease.</li>
+        <li>Several High Courts have held that completing 4 years plus 240 or more working days in the fifth year also satisfies the 5-year requirement under Section 2A. This is a court-recognized position, not explicit statutory text, so it's worth confirming with your employer.</li>
+        <li>Fixed-term employees qualify after 1 year of continuous service under the Code on Social Security, 2020.</li>
+        <li>The formula is 15 days' wages for each year of service: (last drawn salary &times; 15 &times; years) &divide; 26 for employers covered under the Act, or &divide; 30 otherwise. "Salary" means basic pay plus dearness allowance.</li>
+        <li>If your final year of service runs 6 months or more past your last full year, it's rounded up to a full year.</li>
+        <li>Gratuity is capped at &#8377;20 lakh for private-sector employees and &#8377;25 lakh for central government employees; amounts above this aren't tax-exempt even if an employer chooses to pay more.</li>
+      </ul>
+      <p style="margin: 1rem 0 0;">This calculator gives an estimate for general guidance only and isn't a substitute for your employer's payroll or HR computation, or for legal advice.</p>
+    </footer>
+  </div>
+</div>
+
+<script>
+function formatMoney(n) {
+  return '\u20B9' + Math.round(n).toLocaleString('en-IN');
+}
+
+function diffYMD(start, end) {
+  var years = end.getFullYear() - start.getFullYear();
+  var months = end.getMonth() - start.getMonth();
+  var days = end.getDate() - start.getDate();
+  if (days < 0) {
+    months -= 1;
+    var prevMonth = new Date(end.getFullYear(), end.getMonth(), 0);
+    days += prevMonth.getDate();
+  }
+  if (months < 0) {
+    years -= 1;
+    months += 12;
+  }
+  return { years: years, months: months, days: days };
+}
+
+function setStamp(status) {
+  var stamp = document.getElementById('stamp');
+  stamp.classList.remove('amber', 'red');
+  if (status === 'eligible') {
+    stamp.textContent = 'Eligible';
+  } else if (status === 'conditional') {
+    stamp.textContent = 'Possibly eligible';
+    stamp.classList.add('amber');
+  } else {
+    stamp.textContent = 'Not eligible yet';
+    stamp.classList.add('red');
+  }
+}
+
+function calc() {
+  var join = new Date(document.getElementById('joindate').value);
+  var last = new Date(document.getElementById('lastdate').value);
+  var errEl = document.getElementById('date-error');
+
+  if (!document.getElementById('joindate').value || !document.getElementById('lastdate').value || last < join) {
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+
+  var emptype = document.getElementById('emptype').value;
+  var reason = document.getElementById('reason').value;
+  var salary = parseFloat(document.getElementById('salary').value) || 0;
+  var covered = document.getElementById('covered').value === 'yes';
+
+  var ymd = diffYMD(join, last);
+  document.getElementById('out-tenure').textContent = ymd.years + 'y ' + ymd.months + 'm ' + ymd.days + 'd';
+
+  var status = 'not-eligible';
+  var note = '';
+
+  if (reason === 'death' || reason === 'disablement') {
+    status = 'eligible';
+    note = 'The 5-year service requirement is waived for death or disablement due to accident or disease.';
+  } else if (emptype === 'fixed-term') {
+    if (ymd.years >= 1) {
+      status = 'eligible';
+      note = 'Completed ' + ymd.years + ' year(s) of service. Fixed-term staff qualify after 1 year under the Code on Social Security, 2020.';
+    } else {
+      status = 'not-eligible';
+      note = 'Fixed-term staff need at least 1 year of continuous service. ' + ymd.months + ' month(s) completed so far.';
+    }
+  } else {
+    if (ymd.years >= 5) {
+      status = 'eligible';
+      note = 'Completed ' + ymd.years + ' year(s) ' + ymd.months + ' month(s) of continuous service.';
+    } else if (ymd.years === 4) {
+      var fourYearAnniv = new Date(join.getFullYear() + 4, join.getMonth(), join.getDate());
+      var daysInFifthYear = Math.floor((last - fourYearAnniv) / 86400000);
+      if (daysInFifthYear >= 240) {
+        status = 'conditional';
+        note = 'Completed 4 years plus ' + daysInFifthYear + ' days in the 5th year. Several High Courts have recognized 240+ days in the final year as satisfying the 5-year rule under Section 2A \u2014 confirm with HR, as this is not explicit statute.';
+      } else {
+        status = 'not-eligible';
+        note = 'Completed 4 years ' + ymd.months + ' months. Minimum 5 years is required (or 240+ days into the 5th year under the court-recognized exception).';
+      }
+    } else {
+      status = 'not-eligible';
+      note = 'Completed ' + ymd.years + ' year(s) ' + ymd.months + ' month(s). Minimum 5 years of continuous service is required.';
+    }
+  }
+
+  setStamp(status);
+  document.getElementById('verdict-note').textContent = note;
+
+  var effectiveYears = ymd.years;
+  if (ymd.months >= 6) effectiveYears += 1;
+  var divisor = covered ? 26 : 30;
+  var raw = (salary * 15 * effectiveYears) / divisor;
+  var cap = 2000000;
+  var gratuity = raw > cap ? cap : raw;
+
+  document.getElementById('out-years').textContent = effectiveYears;
+  document.getElementById('out-formula').textContent = '15 \u00D7 salary \u00D7 years \u00F7 ' + divisor;
+  document.getElementById('out-gratuity').textContent = formatMoney(gratuity);
+
+  var label = document.getElementById('out-label');
+  if (status === 'eligible') {
+    label.textContent = 'Estimated gratuity payable';
+  } else if (status === 'conditional') {
+    label.textContent = 'Estimated gratuity (subject to eligibility confirmation)';
+  } else {
+    label.textContent = 'Projected gratuity (not yet payable)';
+  }
+}
+
+['joindate', 'lastdate', 'emptype', 'reason', 'salary', 'covered'].forEach(function (id) {
+  document.getElementById(id).addEventListener('input', calc);
+  document.getElementById(id).addEventListener('change', calc);
+});
+
+calc();
+</script>
+
+</body>
+</html>
